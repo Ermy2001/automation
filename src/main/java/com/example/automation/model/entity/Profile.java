@@ -1,55 +1,65 @@
 package com.example.automation.model.entity;
 
-
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Set;
 
 @NoArgsConstructor
-@SuperBuilder
 @Getter
 @Setter
+@SuperBuilder
+@ToString
 
-@Entity(name = "propertyEntity")
-@Table(name = "Property_Entity")
+@Entity(name = "profileEntity")
+@Table(name = "profile_tbl")
+
 public class Profile extends Base {
     @Id
-    @SequenceGenerator(name = "propertySEQ", sequenceName = "Property_SEQ", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "propertySEQ")
-    @Column(name = "codeKala")
-    long codeKala;
+    @Column(name = "username", length = 30)
+//    @Pattern(regexp = "^[a-zA-Z\\d\\s]{2,20}$", message = "Invalid Username")
+    @NotBlank(message = "Username cant be Empty!")
+    @JsonProperty(" : نام کاربری")
+    private String username;
 
 
-    @Pattern(regexp = "^[1-9]$" , message = "Invalid personCode")
-    @Column(name = "personCode")
-    long personCode;
+    @JsonProperty(" : ردیف")
+//    @SequenceGenerator(name = "userSeq", sequenceName = "user_seq", allocationSize = 1)
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSeq")
+    @Column(name = "user_id", length = 22)
+    private Long id;
 
-    @Pattern(regexp = "^[a-zA-Z\\s]{3,50}$" , message = "Invalid gender")
-    @Column(name = "gender" , length = 20)
-    String gender;
+    @Column(name = "password", length = 30)
+    @NotBlank(message = "Password cant be Empty")
+//    @Pattern(regexp = "^[a-zA-Z\\d\\s]{2,20}$", message = "Invalid password")
+    @JsonProperty(": رمز عبور")
+//    @JsonbTransient
+    private String password;
 
-    @Pattern(regexp = "^[a-zA-Z\\s]{3,50}$" , message = "Invalid name")
-    @Column(name = "name" , length = 50)
-    String name;
+    @Column(name = "user_email", length = 30)
+//    @Pattern(regexp = "^[a-zA-Z\\d\\s]{8,50}$", message = "Invalid Email")
+    @JsonProperty(": ایمیل")
+    private String email;
 
-    @Pattern(regexp = "^[a-zA-Z\\s]{3,50}$" , message = "Invalid family")
-    @Column(name = "family" , length = 50)
-    String family;
 
-    @Pattern(regexp = "^[1-9]$" , message = "Invalid National Code")
-    @Column(name = "nationalCode")
-    long nationalCode;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "my_user_role",
+            joinColumns = @JoinColumn(name = "username"),
+            inverseJoinColumns = @JoinColumn(name = "role_name"))
+    @JsonProperty(": عنوان کاربر")
+    private Set<Role> roleList;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "Status" , length = 20)
-    Enum status;
+    @Column(name = "locked", length = 1)
+    @JsonbTransient
+    private boolean locked;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "PropertyType" , length = 20)
-    Enum propertyType;
 }
-
